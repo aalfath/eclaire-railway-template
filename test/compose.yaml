@@ -1,0 +1,31 @@
+# Local test only (Daytona): mirrors the Railway services.
+name: her-3099
+services:
+  postgres:
+    image: postgres:17.5-bookworm
+    environment: { POSTGRES_USER: eclaire, POSTGRES_PASSWORD: localtestpw, POSTGRES_DB: eclaire }
+    volumes: [ "pg:/var/lib/postgresql/data" ]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U eclaire"], interval: 3s, retries: 20 }
+  stub:
+    image: python:3.12-slim
+    command: ["python", "/stub.py"]
+    volumes: [ "./stub.py:/stub.py:ro" ]
+  eclaire:
+    build: ..
+    mem_limit: 512m
+    cpus: 1
+    ports: [ "3000:3000" ]
+    environment:
+      DATABASE_URL: postgresql://eclaire:localtestpw@postgres:5432/eclaire
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      MASTER_ENCRYPTION_KEY: ${MASTER_ENCRYPTION_KEY}
+      API_KEY_HMAC_KEY_V1: ${API_KEY_HMAC_KEY_V1}
+      ADMIN_EMAIL: admin@eclaire.local
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      LLM_API_KEY: test-key
+      LLM_BASE_URL: http://stub:8000/v1
+      LLM_MODEL: stub-model
+      FRONTEND_URL: http://localhost:3000
+    volumes: [ "data:/app/data" ]
+    depends_on: { postgres: { condition: service_healthy } }
+volumes: { pg: {}, data: {} }
