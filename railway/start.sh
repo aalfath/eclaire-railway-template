@@ -42,9 +42,13 @@ export DATABASE_POOL_MAX="${DATABASE_POOL_MAX:-5}"
 log "limits: ${mem_mb} MB, ${cpus} CPU -> heap ${heap} MB, workers ${WORKER_CONCURRENCY}, db pool ${DATABASE_POOL_MAX}"
 
 # ---------- volume ----------
-mkdir -p /app/data/users /app/data/logs /app/data/browser-data /app/config/ai
-[ "$(stat -c %U /app/data)" = nodeapp ] || chown -R nodeapp:nodeapp /app/data
+mkdir -p /app/data /app/config
+# A fresh Railway volume is root-owned; fix ownership once (or after a root-owned leftover).
+if [ "$(stat -c %U /app/data)" != nodeapp ] || [ -n "$(find /app/data -maxdepth 2 ! -user nodeapp -print -quit)" ]; then
+  chown -R nodeapp:nodeapp /app/data
+fi
 chown -R nodeapp:nodeapp /app/config
+as_app mkdir -p /app/data/users /app/data/logs /app/data/browser-data /app/config/ai
 
 # ---------- AI provider: one OpenAI-compatible endpoint from variables ----------
 export LLM_BASE_URL="${LLM_BASE_URL:-https://api.openai.com/v1}"
