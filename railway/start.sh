@@ -40,8 +40,8 @@ export UV_THREADPOOL_SIZE=$(( cpus < 4 ? 4 : cpus )) VIPS_CONCURRENCY="$cpus" MA
 export OMP_THREAD_LIMIT="$cpus" MAGICK_THREAD_LIMIT="$cpus"
 export WORKER_CONCURRENCY="${WORKER_CONCURRENCY:-$(( mem_mb < 1500 ? 1 : 2 ))}"
 export DATABASE_POOL_MAX="${DATABASE_POOL_MAX:-5}"
-# Below 1 GB a full-page screenshot of a long page can exhaust memory: capture the viewport instead.
-export ECLAIRE_FULLPAGE_SCREENSHOTS="${ECLAIRE_FULLPAGE_SCREENSHOTS:-$([ "$mem_mb" -lt 900 ] && echo false || echo true)}"
+# Below 2 GB a full-page screenshot of a long page can exhaust memory: capture the viewport instead.
+export ECLAIRE_FULLPAGE_SCREENSHOTS="${ECLAIRE_FULLPAGE_SCREENSHOTS:-$([ "$mem_mb" -lt 1800 ] && echo false || echo true)}"
 log "limits: ${mem_mb} MB, ${cpus} CPU -> heap ${heap} MB, workers ${WORKER_CONCURRENCY}, db pool ${DATABASE_POOL_MAX}, full-page screenshots ${ECLAIRE_FULLPAGE_SCREENSHOTS}"
 
 # ---------- volume ----------

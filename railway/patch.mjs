@@ -46,7 +46,7 @@ patch(
 );
 
 // 4. Full-page screenshots of long pages need more RAM than a 0.5 GB service has.
-//    ECLAIRE_FULLPAGE_SCREENSHOTS=false (set by start.sh below 1 GB) captures the viewport instead.
+//    ECLAIRE_FULLPAGE_SCREENSHOTS=false (set by start.sh below 2 GB) captures the viewport instead.
 for (const f of [
   "/app/dist/src/workers/lib/bookmarks/browser-pipeline.js",
   "/app/dist/src/workers/lib/bookmarks/reddit-api.js",
