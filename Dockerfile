@@ -8,7 +8,11 @@ COPY railway/ /app/railway/
 #  - email sign-up closed unless ECLAIRE_ALLOW_SIGNUP=true (the admin is created on first boot)
 #  - Docling is optional: without DOCLING_SERVER_URL, documents use the built-in extractors
 #  - Postgres pool size from DATABASE_POOL_MAX
-RUN node /app/railway/patch.mjs \
+#  - viewport-only bookmark screenshots below 1 GB (ECLAIRE_FULLPAGE_SCREENSHOTS)
+#  - Chromium and LibreOffice run through oom-first.sh, so under memory pressure the
+#    kernel stops that one job instead of the whole app
+RUN chmod 755 /app/railway/oom-first.sh \
+ && node /app/railway/patch.mjs \
  && chmod 755 /app/railway/start.sh \
  && chown -R nodeapp:nodeapp /app/railway
 
