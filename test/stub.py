@@ -17,7 +17,8 @@ class H(BaseHTTPRequestHandler):
         n = int(self.headers.get("Content-Length") or 0); req = json.loads(self.rfile.read(n) or b"{}")
         auth = self.headers.get("Authorization", "")
         print("POST", self.path, "auth" if auth.startswith("Bearer ") else "NOAUTH", "stream" if req.get("stream") else "", flush=True)
-        text = REPLY if req.get("response_format") else "Hello from the stub model."
+        prompt = json.dumps(req.get("messages", [])).lower()
+        text = REPLY if (req.get("response_format") or "json" in prompt) else "Hello from the stub model."
         if req.get("stream"):
             self.send_response(200); self.send_header("Content-Type", "text/event-stream"); self.end_headers()
             for part in [text[:10], text[10:]]:
