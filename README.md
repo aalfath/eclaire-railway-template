@@ -1,3 +1,5 @@
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/eclaire?utm_medium=integration&utm_source=button&utm_campaign=eclaire)
+
 # Eclaire on Railway
 
 A one-click [Railway](https://railway.com) template for [Eclaire](https://github.com/eclaire-labs/eclaire), the open-source (MIT) AI assistant for your tasks, notes, documents, photos and bookmarks.
@@ -24,7 +26,7 @@ A one-click [Railway](https://railway.com) template for [Eclaire](https://github
 | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` | Private connection to the Postgres service. |
 | `FRONTEND_URL` | `https://${{RAILWAY_PUBLIC_DOMAIN}}` | Public URL, used for trusted origins. |
 
-Optional, not set by the template: `LLM_VISION=false` (text-only model), `LLM_CONTEXT_WINDOW` (default 128000), `DOCLING_SERVER_URL` (a [Docling Serve](https://github.com/docling-project/docling-serve) service for better PDF and image extraction), `WORKER_CONCURRENCY`, `GITHUB_TOKEN` and `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (richer bookmark processing).
+Optional, not set by the template: `LLM_VISION=false` (text-only model), `LLM_CONTEXT_WINDOW` (default 128000), `DOCLING_SERVER_URL` (a [Docling Serve](https://github.com/docling-project/docling-serve) service for better PDF and image extraction), `WORKER_CONCURRENCY`, `ECLAIRE_FULLPAGE_SCREENSHOTS` (see Resources), `ECLAIRE_ALLOW_SIGNUP=true` (open registration), `GITHUB_TOKEN` and `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` (richer bookmark processing).
 
 ## What this wrapper changes
 
@@ -36,7 +38,15 @@ Optional, not set by the template: `LLM_VISION=false` (text-only model), `LLM_CO
 
 ## Resources
 
-Eclaire's image is about 2 GB (it bundles LibreOffice and Chromium for documents and bookmarks). It runs within Railway's Free plan limit of 0.5 GB per service for normal use, but processing large documents or web pages with Chromium works best with 1 GB or more (Hobby plan). Railway's Free plan allows one volume per project, and this template needs two (Postgres and Eclaire's files), so use the Trial, Hobby or a higher plan.
+Eclaire's image is about 2 GB, because it bundles LibreOffice and Chromium for documents and bookmarks.
+
+**Plan.** Railway's Free plan allows one volume per project, and this template needs two (Postgres and Eclaire's files). Use the Trial, Hobby or a higher plan.
+
+**Memory.** The Eclaire service uses about 250 MB for the web app and workers. We tested it at 0.5 GB / 1 vCPU, and notes, tasks, AI chat, text, PDF and Word documents, and most bookmarks all worked there.
+
+**Larger bookmarks.** Heavy pages such as GitHub repositories can make Chromium run out of memory at 0.5 GB. The start script makes Chromium and LibreOffice the first processes the kernel stops, so the app itself keeps running and the job is retried or marked failed. Give the service 1 GB or more if you bookmark many large pages.
+
+**Full-page screenshots.** These are switched on automatically only from 2 GB, because a full-page capture of a long page can use more than 1 GB. Below that, bookmarks get viewport screenshots. Set `ECLAIRE_FULLPAGE_SCREENSHOTS=true` or `false` to override.
 
 ## Security
 

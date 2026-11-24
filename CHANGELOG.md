@@ -9,3 +9,5 @@ Railway shows deployers an "update available" notice when `main` changes; read t
 - The admin account is created on first boot from `ADMIN_EMAIL` / `ADMIN_PASSWORD`; public sign-up is closed.
 - One OpenAI-compatible AI provider configured from `LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL`.
 - Docling is optional (set `DOCLING_SERVER_URL` to use it); without it documents use the built-in extractors.
+- Sized from the service's memory limit: Node heap, one worker below 1.5 GB, viewport-only bookmark screenshots below 2 GB, and Chromium/LibreOffice are killed before the app when memory runs out.
+- README: Deploy on Railway button and resource notes (two volumes, so Trial plan or higher; 1 GB or more recommended for heavy bookmarks).
