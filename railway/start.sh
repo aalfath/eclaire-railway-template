@@ -5,7 +5,8 @@ set -euo pipefail
 
 log() { echo "[railway] $*"; }
 die() { echo "[railway] FATAL: $*" >&2; exit 1; }
-as_app() { setpriv --reuid=nodeapp --regid=nodeapp --init-groups env HOME=/home/nodeapp "$@"; }
+DROP=(setpriv --reuid=nodeapp --regid=nodeapp --init-groups env HOME=/home/nodeapp)
+as_app() { "${DROP[@]}" "$@"; }
 
 # ---------- required settings ----------
 [ -n "${DATABASE_URL:-}" ] || die "DATABASE_URL is empty (expected \${{Postgres.DATABASE_URL}})."
@@ -65,7 +66,7 @@ marker=/app/data/.railway-admin-created
 if [ ! -f "$marker" ]; then
   log "first boot: creating the admin account ${ADMIN_EMAIL}"
   boot_port=39099
-  as_app env PORT=$boot_port HOST=127.0.0.1 SERVICE_ROLE=api ECLAIRE_ALLOW_SIGNUP=true \
+  "${DROP[@]}" PORT=$boot_port HOST=127.0.0.1 SERVICE_ROLE=api ECLAIRE_ALLOW_SIGNUP=true \
     node dist/src/index.js >/tmp/bootstrap.log 2>&1 &
   boot_pid=$!
   ok=""
@@ -79,6 +80,7 @@ if [ ! -f "$marker" ]; then
   code=$(curl -s -o /tmp/signup.json -w '%{http_code}' -X POST "http://127.0.0.1:$boot_port/api/auth/sign-up/email" \
     -H 'Content-Type: application/json' -H 'Origin: http://localhost:3000' --data "$body" || true)
   kill "$boot_pid" 2>/dev/null || true; wait "$boot_pid" 2>/dev/null || true
+  for _ in $(seq 1 20); do curl -fs "http://127.0.0.1:$boot_port/health" >/dev/null 2>&1 || break; sleep 0.5; done
   if [ "$code" = 200 ]; then
     log "admin account created."
   elif grep -q 'USER_ALREADY_EXISTS\|already exists' /tmp/signup.json 2>/dev/null; then
@@ -94,7 +96,7 @@ fi
 # ---------- run: public server with sign-up closed ----------
 unset ECLAIRE_ALLOW_SIGNUP
 log "starting Eclaire on 0.0.0.0:${PORT} (public URL: ${FRONTEND_URL:-not set yet})"
-as_app node dist/src/index.js &
+"${DROP[@]}" node dist/src/index.js &
 app_pid=$!
 stopping=""
 trap 'stopping=1; kill -TERM "$app_pid" 2>/dev/null || true' TERM INT
