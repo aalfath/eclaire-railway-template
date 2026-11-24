@@ -21,10 +21,9 @@ export DATA_DIR=/app/data CONFIG_DIR=/app/config
 export BACKEND_URL="http://127.0.0.1:${PORT}"
 # FRONTEND_URL comes from https://${{RAILWAY_PUBLIC_DOMAIN}}; ignore an empty or half-resolved value.
 case "${FRONTEND_URL:-}" in
-  http://?*.?*|https://?*.?*) ;;
+  http://?*|https://?*) export FRONTEND_URL="${FRONTEND_URL%/}" ;;
   *) if [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then export FRONTEND_URL="https://${RAILWAY_PUBLIC_DOMAIN}"; else unset FRONTEND_URL; fi ;;
 esac
-export FRONTEND_URL="${FRONTEND_URL%/}"
 
 # ---------- sizing: follow the service's limits, not the host's ----------
 mem_bytes=$(cat /sys/fs/cgroup/memory.max 2>/dev/null || echo max)
