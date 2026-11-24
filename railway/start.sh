@@ -96,7 +96,6 @@ if [ ! -f "$marker" ]; then
 fi
 
 # ---------- run: public server with sign-up closed ----------
-unset ECLAIRE_ALLOW_SIGNUP
 log "starting Eclaire on 0.0.0.0:${PORT} (public URL: ${FRONTEND_URL:-not set yet})"
 "${DROP[@]}" node dist/src/index.js &
 app_pid=$!
