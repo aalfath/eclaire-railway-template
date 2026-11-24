@@ -25,5 +25,5 @@ if [ "$PHASE" = seed ]; then
   echo "AI prompt -> HTTP $c $(head -c 200 /tmp/p.json)"; [ "$c" = 200 ] || fail "AI prompt"
 fi
 curl -s -b "$J" "$B/api/notes" | grep -q 'Railway persistence check' && echo "note present" || fail "note missing"
-curl -s -b "$J" "$B/api/documents" | grep -q 'Smoke document' && echo "document present" || fail "document missing"
+curl -s -b "$J" "$B/api/documents" | grep -q '"originalFilename":"doc.txt"' && echo "document present" || fail "document missing"
 echo "PASS ($PHASE)"
